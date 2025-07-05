@@ -11,6 +11,7 @@ const allSections = document.querySelectorAll('.section');
 const header = document.querySelector('.header');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.getElementById('section--1');
+const message = document.createElement('div');
 
 const openModal = function (e) {
   e.preventDefault();
@@ -38,7 +39,6 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-const message = document.createElement('div');
 message.classList.add('cookie-message');
 message.innerHTML = `We use cookies for imporved functionality and analytics. <button class='btn btn--close-cookie'>Got it!</button>`;
 header.append(message);
@@ -60,4 +60,20 @@ btnScrollTo.addEventListener('click', function (e) {
   //   behavior: 'smooth',
   // });
   section1.scrollIntoView({ behavior: 'smooth' });
+});
+
+// document.querySelectorAll('.nav__link').forEach(function (el) {
+//   el.addEventListener('click', function (e) {
+//     e.preventDefault();
+//     const id = this.getAttribute('href');
+//     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+//   });
+// }); NOT EFFICIENT BETTER TO USE EVENT DELEGATION
+
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  e.preventDefault();
+  if (e.target.classList.contains('nav__link')) {
+    const id = e.target.getAttribute('href');
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
 });
