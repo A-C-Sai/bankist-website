@@ -16,6 +16,7 @@ const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabContent = document.querySelectorAll('.operations__content');
 const navLinks = document.querySelector('.nav__links');
+const nav = document.querySelector('.nav');
 
 const openModal = function (e) {
   e.preventDefault();
@@ -126,4 +127,75 @@ navLinks.addEventListener('mouseover', handleHover.bind({ opacity: 0.5 }));
 navLinks.addEventListener('mouseout', handleHover.bind({ opacity: 1 }));
 
 ///////////////////////////////////////
-// Sticky Navigation
+// Sticky Navigation (inefficient + error prone)
+
+// const initialCoor = section1.getBoundingClientRect().top; // page has to be scrolled up to the top b4 working as intended.
+
+// window.addEventListener('scroll', function (e) {
+//   if (window.scrollY > initialCoor) nav.classList.add('sticky');
+//   else nav.classList.remove('sticky');
+// });
+
+///////////////////////////////////////
+// Sticky Navigation (INTERSECTION OBSERVER API)
+
+let initialized = false;
+
+const obsCallback = function (entries, observer) {
+  if (!initialized) {
+    initialized = true;
+    return;
+  }
+  nav.classList.toggle('sticky');
+};
+
+const obsOptions = { root: null, threshold: 0, rootMargin: `-${nav.getBoundingClientRect().height}px` };
+// '-' + getComputedStyle(nav).height
+
+const observer = new IntersectionObserver(obsCallback, obsOptions);
+observer.observe(header);
+
+///////////////////////////////////////
+// Revealing Elements On Scroll
+
+const revealSection = function (entries, observer) {
+  // fixes the bug where user refreshes page b/w two sections
+  console.log(entries);
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.remove('section--hidden');
+    observer.unobserve(entry);
+  });
+};
+
+const sectionObserver = new IntersectionObserver(revealSection, { root: null, threshold: 0.1 });
+
+allSections.forEach((section) => {
+  section.classList.add('section--hidden');
+  sectionObserver.observe(section);
+});
+
+///////////////////////////////////////
+// Lazy Loading Images
+
+const revealImg = function (entries, observer) {
+  console.log(entries);
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    // replacing of src attribute happens behind the scenes, once finished a load event is emitted
+    entry.target.setAttribute('src', entry.target.dataset.src);
+    // removing the class may pose problems, what if the network is slow and image takes more time to load
+    // entry.target.classList.remove('lazy-img');
+    entry.target.addEventListener('load', function () {
+      entry.target.classList.remove('lazy-img');
+    });
+    observer.unobserve(entry.target);
+  });
+};
+
+const lazyImages = document.querySelectorAll('img[data-src]');
+
+const imgObserver = new IntersectionObserver(revealImg, { root: null, threshold: 0.5 });
+lazyImages.forEach((lazyImg) => {
+  imgObserver.observe(lazyImg);
+});
