@@ -199,3 +199,71 @@ const imgObserver = new IntersectionObserver(revealImg, { root: null, threshold:
 lazyImages.forEach((lazyImg) => {
   imgObserver.observe(lazyImg);
 });
+
+///////////////////////////////////////
+// Slider
+
+// const slider --> could wrap the entire below code into a function
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
+const dotContainer = document.querySelector('.dots');
+
+// slider.style.transform = 'scale(0.2)';
+// slider.style.overflow = 'visible';
+
+const createDots = function () {
+  slides.forEach((_, i) =>
+    dotContainer.insertAdjacentHTML('beforeend', `<button class="dots__dot" data-slide="${i}"></button>`)
+  );
+};
+
+createDots();
+
+const activateDot = function (slide) {
+  document.querySelectorAll('.dots__dot').forEach((dot) => dot.classList.remove('dots__dot--active'));
+  document.querySelector(`[data-slide="${slide}"]`).classList.add('dots__dot--active');
+};
+
+let currSlide = 0;
+const goToSlide = function (slide) {
+  slides.forEach((s, i) => (s.style.transform = `translateX(${(i - slide) * 100}%)`));
+  activateDot(slide);
+};
+goToSlide(0);
+
+// slides.forEach((s, i) => (s.style.transform = `translateX(${i * 100}%)`));
+
+const nextSlide = function () {
+  if (currSlide === slides.length - 1) {
+    currSlide = 0;
+  } else {
+    currSlide++;
+  }
+  goToSlide(currSlide);
+};
+
+btnRight.addEventListener('click', nextSlide);
+
+const prevSlide = function () {
+  if (currSlide === 0) {
+    currSlide = slides.length - 1;
+  } else {
+    currSlide--;
+  }
+  goToSlide(currSlide);
+};
+
+btnLeft.addEventListener('click', prevSlide);
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowRight') nextSlide();
+  e.key === 'ArrowLeft' && prevSlide();
+});
+
+dotContainer.addEventListener('click', function (e) {
+  if (e.target.classList.contains('dots__dot')) {
+    currSlide = Number(e.target.dataset.slide);
+    goToSlide(currSlide);
+  }
+});
