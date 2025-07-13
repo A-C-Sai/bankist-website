@@ -1,4 +1,5 @@
 'use strict';
+// FIXME: there is a minro bug in the reveal section functionality, figure out what is causing this
 
 ///////////////////////////////////////
 // Modal window
@@ -267,3 +268,5 @@ dotContainer.addEventListener('click', function (e) {
     goToSlide(currSlide);
   }
 });
+
+window.addEventListener('beforeunload', () => window.scrollTo(0, 0));
